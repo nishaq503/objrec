@@ -50,6 +50,7 @@ def prepare_batch(
         batch: List[tf.Tensor],
         point_dim: int = None,
 ) -> Tuple[tf.Tensor, tf.Tensor, int, int]:
+
     if point_dim is None:
         point_dim = batch[0].shape(1)
 
