@@ -42,20 +42,22 @@ class Search:
             )
             self.root.make_tree()
 
-        self.cluster_dict_: Dict[str: Cluster] = self._get_cluster_dict()
+        self.cluster_dict_: Dict[str: Cluster] = self.get_info_dict(lambda x, *args: x, {})
         return
 
-    def _get_cluster_dict(self):
-        cluster_dict = {}
+    def get_info_dict(self, function, *args):
+        info_dict = {}
 
-        def in_order(node: Cluster):
-            cluster_dict[node.name] = node
+        def in_order(node: Cluster, function_, *args_):
+            info_dict[node.name] = function_(node, *args_)
             if node.left or node.right:
-                in_order(node.left)
-                in_order(node.right)
+                in_order(node.left, function_, *args_)
+                in_order(node.right, function_, *args_)
+            return
 
-        in_order(self.root)
-        return cluster_dict
+        in_order(self.root, function, *args)
+
+        return info_dict
 
     def linear_search(self, query: np.ndarray, radius: float) -> List[int]:
         """ Perform linear search for comparison with clustered search.
@@ -204,5 +206,5 @@ class Search:
                     cluster.update(internals_only=True)
                     cluster.pop()
 
-            self.cluster_dict_ = self._get_cluster_dict()
+            self.cluster_dict_ = self.get_info_dict(lambda x, *args: x, {})
         return

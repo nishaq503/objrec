@@ -52,6 +52,7 @@ class Cluster:
         self.min_points = globals.MIN_POINTS
         self.min_radius = globals.MIN_RADIUS
         self.should_subsample: bool = len(points) > globals.NP_PTS
+        self.should_subsample = False  # avoiding GPU usage for now
 
         self._potential_centers = None
         self._pairwise_distances = None
@@ -68,7 +69,7 @@ class Cluster:
 
         :return: list of indexes of potential centers.
         """
-        if self.should_subsample:
+        if len(self.points) > globals.NP_PTS:
             sample_size = int(np.sqrt(len(self.points)))
             points = self.points.copy()
             np.random.shuffle(points)
@@ -81,7 +82,7 @@ class Cluster:
 
         :return: pairwise distance matrix between potential centers.
         """
-        if self.should_subsample:
+        if len(self.points) > globals.NP_PTS:
             points = np.asarray([self.data[p] for p in self._potential_centers])
             return tf_calculate_pairwise_distances(points, self.df)
         else:
@@ -106,10 +107,14 @@ class Cluster:
         :return: cluster radius.
         """
         if self.should_subsample:
-            return max(max([max(tf_calculate_distance(self.data[self.center], self._get_batch(i), self.df))
-                            for i in range(0, len(self.points), self.batch_size)]), 0.0)
+            radii = [max(tf_calculate_distance(self.data[self.center], self._get_batch(i), self.df))
+                     for i in range(0, len(self.points), self.batch_size)]
+            radius = max(radii)
+            return max(radius, 0.0)
+            # return max(max([max(tf_calculate_distance(self.data[self.center], self._get_batch(i), self.df))
+            #                 for i in range(0, len(self.points), self.batch_size)]), 0.0)
         else:
-            points = np.asarray([self.data[p] for p in self.points])
+            points = np.asfarray([self.data[p] for p in self.points])
             distances = numpy_calculate_distance(self.data[self.center], points, self.df)
             return max(max(distances), 0.0)
 
