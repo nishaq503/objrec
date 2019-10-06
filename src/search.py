@@ -1,13 +1,10 @@
-import os
-import pickle
-import zipfile
 from typing import List, Tuple, Dict
 
 import numpy as np
 
 from src import globals
 from src.cluster import Cluster
-from src.utils import tf_calculate_distance
+from src.distance_functions import tf_calculate_distance
 
 
 class Search:

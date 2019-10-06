@@ -1,5 +1,7 @@
 .idea
 data
 .objrec
-
 .vscode
+__pycache__
+.ipynb_checkpoints
+*.ipynb

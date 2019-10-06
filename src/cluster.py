@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 
 from src import globals
-from src.utils import tf_calculate_pairwise_distances, numpy_calculate_distance, tf_calculate_distance
+from src.distance_functions import tf_calculate_pairwise_distances, numpy_calculate_distance, tf_calculate_distance
 
 
 class Cluster:
@@ -196,7 +196,7 @@ class Cluster:
                  for j, l, r in zip(range(len(batch)), left_distances, right_distances)]
 
         else:
-            points = [self.data[p] for p in self.points]
+            points = np.asfarray([self.data[p] for p in self.points])
             left_distances = numpy_calculate_distance(self.data[left_pole], points, self.df)
             right_distances = numpy_calculate_distance(self.data[right_pole], points, self.df)
 
