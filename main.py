@@ -210,7 +210,7 @@ if __name__ == '__main__':
     #     radius_c=rc_,
     #     radius_a=ra_,
     # )
-    n_, v_ = 4, 1000
+    n_, v_ = 4, 10
     file_name = f'shapes/noisy_klein_bottle_{n_}_{v_}.csv'
     # generate_klein_bottle(
     #     filename=file_name,
@@ -218,7 +218,5 @@ if __name__ == '__main__':
     #     variance=v_,
     # )
     # plot_points(filename=file_name, limits=[-2, 2])
-    # check_df('l2')
-    # get_clusters(file_name, 15)
     volume_ratios_ = get_volume_ratios(file_name, depth=20)
     # [print(i_, ':', line_) for i_, line_ in enumerate(volume_ratios_[:len(volume_ratios_) // 2])]
