@@ -126,6 +126,10 @@ def get_volume_ratios(depth=15):
                 target_ratio = volume_ratios[names_index[target]][len(target)] / target_volume
                 volume_ratios[names_index[target]][len(children[0])] = target_ratio
             volume_ratios[names_index[target]][len(target)] = 0
+
+    volumes_df = pd.DataFrame(data=volume_ratios, dtype=float)
+    volumes_df['cluster_name'] = cluster_names
+    volumes_df.to_csv(f'volumes/{filename.split("/")[1]}', index=False)
     return volume_ratios
 
 
