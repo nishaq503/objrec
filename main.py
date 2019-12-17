@@ -185,17 +185,17 @@ def get_volume_ratios(filename: str, depth=15):
     volumes_df = pd.DataFrame(data=volume_ratios, dtype=float)
     volumes_df['cluster_name'] = cluster_names
     volumes_df.to_csv(f'volumes/{filename.split("/")[1]}', index=False)
-    return volume_ratios
+    return volume_ratios, search_object
 
 
 if __name__ == '__main__':
     np.random.seed(42)
-    # n_, r_, x_, y_, z_ = 4, 1, 0, 0, 0
-    # file_name = f'shapes/noisy_sphere_{n_}_{r_}_{x_}_{y_}_{z_}.csv'
+    # n_, v_, r_, x_, y_, z_ = 4, 10**5, 1, 0, 0, 0
+    # file_name = f'shapes/noisy_sphere_{n_}_{v_}_{r_}_{x_}_{y_}_{z_}.csv'
     # generate_sphere(
     #     filename=file_name,
     #     num_points=n_,
-    #     variance=100,
+    #     variance=v_,
     #     radius=r_,
     #     x_center=x_,
     #     y_center=y_,
@@ -210,13 +210,14 @@ if __name__ == '__main__':
     #     radius_c=rc_,
     #     radius_a=ra_,
     # )
-    n_, v_ = 4, 10
+    n_, v_ = 4, 1000
     file_name = f'shapes/noisy_klein_bottle_{n_}_{v_}.csv'
-    # generate_klein_bottle(
-    #     filename=file_name,
-    #     num_points=n_,
-    #     variance=v_,
-    # )
-    # plot_points(filename=file_name, limits=[-2, 2])
-    volume_ratios_ = get_volume_ratios(file_name, depth=20)
+    generate_klein_bottle(
+        filename=file_name,
+        num_points=n_,
+        variance=v_,
+    )
+    plot_points(filename=file_name, limits=[-2, 2])
+    # search_object_ = get_clusters(file_name, depth=20)
+    # volume_ratios_ = get_volume_ratios(file_name, depth=20)
     # [print(i_, ':', line_) for i_, line_ in enumerate(volume_ratios_[:len(volume_ratios_) // 2])]
