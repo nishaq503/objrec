@@ -7,3 +7,6 @@ __pycache__
 *.ipynb
 shapes
 volumes
+.python-version
+build
+plots
