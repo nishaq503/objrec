@@ -16,7 +16,7 @@ PLOTS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'plot
 def volume_ratios(data: np.ndarray, filename: str) -> pd.DataFrame:
     if os.path.exists(filename):
         volumes_df = pd.read_csv(filename)
-        volumes_df.fillna(0, inplace=True)
+        volumes_df.fillna('', inplace=True)
     else:
         # Create manifold from data
         manifold = Manifold(data, 'euclidean').build_tree(criterion.MaxDepth(16), criterion.MinPoints(8))
@@ -50,7 +50,7 @@ def volume_ratios(data: np.ndarray, filename: str) -> pd.DataFrame:
 
 
 def plot_ratios(volumes_df: pd.DataFrame, filename: str):
-    names = [str(int(n)) for n in volumes_df['cluster_names']]
+    names = [str(int(n)) if n != '' else '' for n in volumes_df['cluster_names']]
     del volumes_df['cluster_names']
     ratios = np.asarray(volumes_df.values, dtype=np.float32)
 

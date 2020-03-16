@@ -8,3 +8,5 @@ __pycache__
 shapes
 volumes
 .python-version
+build
+plots
