@@ -10,3 +10,4 @@ volumes
 .python-version
 build
 plots
+*.pdf

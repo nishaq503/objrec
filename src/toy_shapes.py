@@ -2,13 +2,13 @@ import numpy as np
 from matplotlib import pyplot as plt
 # noinspection PyUnresolvedReferences
 from mpl_toolkits.mplot3d import Axes3D
-from pyclam import datasets
+from pyclam import datasets as pyclam_datasets
 
 
 def sphere(
         radius: float = 5.,
         noise: float = 1e-2,
-        num_points: int = 10 ** 4,
+        num_points: int = 10**3,
 ) -> np.ndarray:
     data: np.ndarray = np.random.randn(3, num_points)
     data /= np.linalg.norm(data, axis=0)
@@ -20,15 +20,15 @@ def sphere(
 def torus(
         radius: float = 5.,
         noise: float = 1e-2,
-        num_points: int = 10 ** 4,
+        num_points: int = 10**3,
 ) -> np.ndarray:
-    return np.stack(datasets.generate_torus(n=num_points, r_torus=radius, noise=noise))
+    return np.stack(pyclam_datasets.generate_torus(n=num_points, r_torus=radius, noise=noise))
 
 
 def klein_bottle(
         radius: float = 5.,
         noise: float = 1e-2,
-        num_points: int = 10 ** 4,
+        num_points: int = 10**3,
 ) -> np.ndarray:
     u, v = np.random.rand(num_points), np.random.rand(num_points)
     u, v = u * np.pi, v * 2 * np.pi
