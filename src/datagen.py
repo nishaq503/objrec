@@ -31,7 +31,7 @@ def get_persistent_components(data: np.array) -> np.array:
 
 
 def create_training_data(n: int = 10**3, m: int = 10):
-    # N = 3 * (3 + 3) * m * m = 18.m^2  instances
+    # N = 3 * 6 * m * m = 18.m^2  instances
     # 3 shapes
     # m distortions each in x, y, z, tay, pitch, and roll
     # m shuffles of each instance of shape above
@@ -41,11 +41,11 @@ def create_training_data(n: int = 10**3, m: int = 10):
         for distortion in range(6):
             for _ in range(m):
                 data = SHAPES[shape](num_points=n)
-                if distortion < 3:  # x, y, or z
-                    scale = np.random.sample() * 1.5 + .5
+                if distortion < 3:  # scale along x, y, or z axis
+                    scale = np.random.sample() * 1.5 + .5  # scale by random number in [0.5, 2)
                     data[distortion] = data[distortion] * scale
                 else:
-                    angle = np.random.sample()
+                    angle = np.random.sample() * 2 * np.pi  # rotate by random angle in [0, 2 * pi)
                     if distortion == 3:  # yaw, rotation about z-axis
                         matrix = np.asarray([
                             [np.cos(angle), -np.sin(angle), 0],
@@ -65,14 +65,16 @@ def create_training_data(n: int = 10**3, m: int = 10):
                             [0, np.sin(angle), np.cos(angle)],
                         ])
                     data = np.matmul(matrix, data)
-                data = data.T
-                csv_name: str = f'{shape}-{count}.csv'
-                count += 1
-                np.savetxt(os.path.join(SHAPES_PATH, csv_name), data, fmt='%.12f', delimiter=',')
+                data = data.T  # transpose so each row is a data point.
+                for _ in range(m):  # shuffle points for more robust training
+                    np.random.shuffle(data)  # shuffle rows in data
+                    csv_name: str = f'{shape}-{count}.csv'
+                    count += 1
+                    np.savetxt(os.path.join(SHAPES_PATH, csv_name), data, fmt='%.12f', delimiter=',')
 
-                persistence_vectors: np.array = get_persistent_components(data)
-                # noinspection PyTypeChecker
-                np.savetxt(os.path.join(DATA_PATH, csv_name), persistence_vectors, fmt='%d', delimiter=',')
+                    persistence_vectors: np.array = get_persistent_components(data)
+                    # noinspection PyTypeChecker
+                    np.savetxt(os.path.join(DATA_PATH, csv_name), persistence_vectors, fmt='%d', delimiter=',')
     return
 
 
@@ -80,4 +82,4 @@ if __name__ == '__main__':
     np.random.seed(42)
     os.makedirs(DATA_PATH, exist_ok=True)
     os.makedirs(SHAPES_PATH, exist_ok=True)
-    create_training_data(n=1000, m=10)
+    create_training_data(n=10**3, m=10)
