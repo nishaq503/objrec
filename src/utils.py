@@ -4,7 +4,8 @@ from typing import Optional
 import numpy as np
 from matplotlib import pyplot as plt
 
-BUILD_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'build'))
+SHAPES_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'shapes'))
+DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data'))
 PLOTS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'plots'))
 
 
