@@ -144,4 +144,7 @@ dmypy.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 data/
+shapes/
 .vscode/
+.idea/
+.objrec/
