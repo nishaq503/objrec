@@ -7,8 +7,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from pyclam import Cluster, Manifold
 
-from toy_shapes import SHAPES
-from utils import PLOTS_PATH
+from src.toy_shapes import SHAPES
+from src.utils import PLOTS_PATH
 
 # Cluster -> (birth-radius, death-radius)
 Barcodes = Dict[Cluster, Tuple[float, float]]
@@ -86,11 +86,32 @@ def cli():
 @click.argument('num_points', type=int, default=10**3)
 @click.argument('steps', type=int, default=10**3)
 def main(num_points: int, steps: int):
+    report_file = os.path.join(PLOTS_PATH, 'time.txt')
+    if os.path.exists(report_file):
+        os.remove(report_file)
     for shape in SHAPES:
         start_time: float = time.time()
-        barcodes = create_barcodes(SHAPES[shape](num_points=num_points).T, steps=steps, normalize=True)
-        print(f'It took {time.time() - start_time:.2f} seconds for a {shape} with {num_points} points and {steps} resolution.')
-        plot_barcodes(barcodes, os.path.join(PLOTS_PATH, f'barcodes-{shape}.png'), merge=4)
+        barcodes = create_barcodes(
+            SHAPES[shape](num_points=num_points).T,
+            steps=steps,
+            normalize=True,
+        )
+        end_time = time.time()
+        report_barcodes = f'{shape}, {num_points:.0e} points, {steps:.0e} resolution, ' \
+                          f'{end_time - start_time:.2f} sec for barcodes,'
+        print(report_barcodes, end=' ')
+
+        plot_barcodes(
+            barcodes,
+            os.path.join(PLOTS_PATH, f'barcodes-{shape}.png'),
+            merge=4,
+        )
+
+        report_plot = f'{time.time() - end_time:.2f} sec to plot.'
+        print(report_plot)
+
+        with open(report_file, 'a') as fp:
+            fp.write(f'{report_barcodes} {report_plot}\n')
     return
 
 
