@@ -148,4 +148,7 @@ shapes/
 .vscode/
 .idea/
 .objrec/
+.obrec/
 plots/
+digested
+*.zip
