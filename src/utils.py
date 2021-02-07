@@ -4,9 +4,24 @@ from typing import Optional
 import numpy as np
 from matplotlib import pyplot as plt
 
-SHAPES_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'shapes'))
-DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data'))
-PLOTS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'plots'))
+SRC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+SHAPES_DIR = os.path.join(SRC_DIR, 'shapes')
+DATA_DIR = os.path.join(SRC_DIR, 'data')
+PLOTS_DIR = os.path.join(SRC_DIR, 'plots')
+BARCODES_DIR = os.path.join(DATA_DIR, 'barcodes')
+
+
+def increment_filename(filename: str) -> str:
+    # expected filename format is {directory}/{name}__{number}.{extension}
+    while os.path.exists(filename):
+        split_name = filename.split('.')
+        dir_name_num, extension = split_name[0], split_name[1]
+        split_name = dir_name_num.split('__')
+        dir_name, number = split_name[0], int(split_name[1])
+        number += 1
+        filename = f'{dir_name}__{number}.{extension}'
+
+    return filename
 
 
 def hist_plot(x: np.array, bins: Optional[int], log: bool, xlabel: str, title: str, filename: str):

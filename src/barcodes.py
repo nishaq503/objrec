@@ -1,20 +1,25 @@
-import os
-import time
-from typing import Dict, Tuple, Set, List, Optional
+from typing import Dict
+from typing import List
+from typing import Set
+from typing import Tuple
 
-import click
-import numpy as np
-from matplotlib import pyplot as plt
-from pyclam import Cluster, Manifold
+from pyclam import Cluster
+from pyclam import Manifold
 
 from src.toy_shapes import SHAPES
-from src.utils import PLOTS_PATH
+from src.utils import *
 
 # Cluster -> (birth-radius, death-radius)
 Barcodes = Dict[Cluster, Tuple[float, float]]
 
 
-def create_barcodes(data: np.array, *, steps: Optional[int] = 10**3, normalize: bool = False) -> Barcodes:
+def create_barcodes(
+        data: np.array,
+        *,
+        steps: Optional[int] = 10**3,
+        normalize: bool = False,
+        merge: Optional[int] = None,
+) -> Dict[int, Barcodes]:
     manifold: Manifold = Manifold(data, 'euclidean').build()
     thresholds: np.array = np.linspace(start=manifold.root.radius * (steps - 1) / steps, stop=0, num=steps)
     barcodes: Barcodes = dict()
@@ -36,16 +41,12 @@ def create_barcodes(data: np.array, *, steps: Optional[int] = 10**3, normalize: 
     if normalize:  # normalize radii to [0, 1] range.
         factor = manifold.root.radius
         barcodes = {c: (b / factor, d / factor) for c, (b, d) in barcodes.items()}
-
-    return barcodes
-
-
-def plot_barcodes(full_barcodes: Barcodes, filename: str, *, merge: Optional[int] = None):
-    cardinalities: List[int] = list(sorted({cluster.cardinality for cluster in full_barcodes}))
+    
+    cardinalities: List[int] = list(sorted({cluster.cardinality for cluster in barcodes}))
     barcodes_by_cardinality: Dict[int, Barcodes] = {cardinality: dict() for cardinality in cardinalities}
     [barcodes_by_cardinality[cluster.cardinality].update({cluster: lifetime})
-     for cluster, lifetime in full_barcodes.items()]
-
+     for cluster, lifetime in barcodes.items()]
+    
     if merge is not None:
         # Merges all barcodes for clusters with cardinality greater than 'merge'
         high_cardinalities = [v for c, v in barcodes_by_cardinality.items() if c >= merge]
@@ -53,7 +54,11 @@ def plot_barcodes(full_barcodes: Barcodes, filename: str, *, merge: Optional[int
             [high_cardinalities[0].update(h) for h in high_cardinalities[1:]]
             barcodes_by_cardinality = {c: v for c, v in barcodes_by_cardinality.items() if c < merge}
             barcodes_by_cardinality[merge] = high_cardinalities[0]
+    
+    return barcodes_by_cardinality
 
+
+def plot_barcodes(barcodes_by_cardinality: Dict[int, Barcodes], filename: str):
     fig = plt.figure(figsize=(16, 10), dpi=200)
     ax = fig.add_subplot(111)
 
@@ -77,44 +82,54 @@ def plot_barcodes(full_barcodes: Barcodes, filename: str, *, merge: Optional[int
     return
 
 
-@click.group()
-def cli():
-    pass
+def write(
+        num_points: int = 10**2,
+        resolution: int = 10**2,
+        number_per_shape: int = 10**1,
+):
+    for shape in SHAPES:
+        filename = os.path.join(BARCODES_DIR, f'{shape}__0.csv')
+        for _ in range(number_per_shape):
+            filename = increment_filename(filename)
+            with open(filename, 'w') as fp:
+                fp.write('cardinality,birth,death\n')
+
+            barcodes_by_cardinality = create_barcodes(
+                SHAPES[shape](num_points=num_points).T,
+                steps=resolution,
+                normalize=True,
+                merge=4,
+            )
+            cardinalities = list(sorted(list(barcodes_by_cardinality.keys())))
+            for cardinality in cardinalities:
+                barcodes = barcodes_by_cardinality[cardinality]
+                barcodes = list(sorted([(birth, death) for birth, death in barcodes.values()]))
+                with open(filename, 'a') as fp:
+                    for birth, death in barcodes:
+                        fp.write(f'{cardinality},{birth:.4f},{death:.4f}\n')
+    return
 
 
-@cli.command()
-@click.argument('num_points', type=int, default=10**3)
-@click.argument('steps', type=int, default=10**3)
-def main(num_points: int, steps: int):
-    report_file = os.path.join(PLOTS_PATH, 'time.txt')
+def plot(num_points: int = 10**2, resolution: int = 10**2):
+    report_file = os.path.join(PLOTS_DIR, 'time.txt')
     if os.path.exists(report_file):
         os.remove(report_file)
     for shape in SHAPES:
-        start_time: float = time.time()
         barcodes = create_barcodes(
             SHAPES[shape](num_points=num_points).T,
-            steps=steps,
+            steps=resolution,
             normalize=True,
-        )
-        end_time = time.time()
-        report_barcodes = f'{shape}, {num_points:.0e} points, {steps:.0e} resolution, ' \
-                          f'{end_time - start_time:.2f} sec for barcodes,'
-        print(report_barcodes, end=' ')
-
-        plot_barcodes(
-            barcodes,
-            os.path.join(PLOTS_PATH, f'barcodes-{shape}.png'),
             merge=4,
         )
-
-        report_plot = f'{time.time() - end_time:.2f} sec to plot.'
-        print(report_plot)
-
-        with open(report_file, 'a') as fp:
-            fp.write(f'{report_barcodes} {report_plot}\n')
+        plot_barcodes(
+            barcodes,
+            os.path.join(PLOTS_DIR, f'barcodes-{shape}.png'),
+        )
     return
 
 
 if __name__ == '__main__':
-    os.makedirs(PLOTS_PATH, exist_ok=True)
-    main()
+    os.makedirs(PLOTS_DIR, exist_ok=True)
+    os.makedirs(BARCODES_DIR, exist_ok=True)
+    # plot()
+    write()

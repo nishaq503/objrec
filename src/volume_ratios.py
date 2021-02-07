@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from pyclam import Manifold, criterion, Cluster
 
 from src.toy_shapes import SHAPES, plot_shape
-from src.utils import SHAPES_PATH, PLOTS_PATH
+from src.utils import SHAPES_DIR, PLOTS_DIR
 
 
 def volume_ratios(data: np.ndarray, filename: str) -> pd.DataFrame:
@@ -74,8 +74,8 @@ def _plot_ratios(volumes_df: pd.DataFrame, filename: str):
 
 
 def plot_ratios():
-    os.makedirs(SHAPES_PATH, exist_ok=True)
-    os.makedirs(PLOTS_PATH, exist_ok=True)
+    os.makedirs(SHAPES_DIR, exist_ok=True)
+    os.makedirs(PLOTS_DIR, exist_ok=True)
 
     for shape in SHAPES:
         np.random.seed(42)
@@ -84,6 +84,6 @@ def plot_ratios():
         plot_shape(points)
 
         _plot_ratios(
-            volume_ratios(points.T, os.path.join(SHAPES_PATH, f'{shape}.csv')),
-            os.path.join(PLOTS_PATH, f'{shape}.png')
+            volume_ratios(points.T, os.path.join(SHAPES_DIR, f'{shape}.csv')),
+            os.path.join(PLOTS_DIR, f'{shape}.png')
         )

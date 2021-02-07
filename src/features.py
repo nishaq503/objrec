@@ -4,7 +4,7 @@ from typing import List
 from pyclam import Manifold
 
 from src.toy_shapes import SHAPES
-from src.utils import hist_plot, PLOTS_PATH
+from src.utils import hist_plot, PLOTS_DIR
 
 
 def depth_distribution(shape: str, filename: str):
@@ -30,11 +30,11 @@ def radii_distribution(shape: str, filename: str):
 def make_plots(option: str):
     if option == 'depth-distributions':  # view depth distributions for leaves of Manifolds over shapes
         for shape in SHAPES:
-            filename = os.path.join(PLOTS_PATH, f'{shape}-leaf-depths.png')
+            filename = os.path.join(PLOTS_DIR, f'{shape}-leaf-depths.png')
             depth_distribution(shape, filename)
     elif option == 'radii-distributions':  # view radii distributions for clusters in Manifolds over shapes
         for shape in SHAPES:
-            filename = os.path.join(PLOTS_PATH, f'{shape}-radii.png')
+            filename = os.path.join(PLOTS_DIR, f'{shape}-radii.png')
             radii_distribution(shape, filename)
     else:
         raise ValueError(f'option {option} not implemented. Try:'
