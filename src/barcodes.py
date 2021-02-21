@@ -149,7 +149,7 @@ def write(
         for _ in range(number_per_shape):
             filename = increment_filename(filename)
             with open(filename, 'w') as fp:
-                fp.write('cardinality,birth,death\n')
+                fp.write('dimension,birth,death\n')
 
             barcodes_by_cardinality = create_barcodes(
                 SHAPES[shape](num_points=num_points).T,
@@ -162,7 +162,7 @@ def write(
                 barcodes = list(sorted([(birth, death) for birth, death in barcodes.values()]))
                 with open(filename, 'a') as fp:
                     for birth, death in barcodes:
-                        fp.write(f'{cardinality},{birth:.12f},{death:.12f}\n')
+                        fp.write(f'{cardinality - 1},{birth:.12f},{death:.12f}\n')
     return
 
 
